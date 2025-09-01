@@ -1,2 +1,2 @@
 
-"""FNLLM provider module."""
+"""Gemini provider module."""

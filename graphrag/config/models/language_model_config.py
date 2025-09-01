@@ -31,7 +31,7 @@ class LanguageModelConfig(BaseModel):
     def _validate_api_key(self) -> None:
         """Validate the API key.
 
-        API Key is required when using OpenAI API
+        API Key is required when using OpenAI API, Gemini API,
         or when using Azure API with API Key authentication.
         For the time being, this check is extra verbose for clarity.
         It will also raise an exception if an API Key is provided
@@ -43,9 +43,13 @@ class LanguageModelConfig(BaseModel):
         ApiKeyMissingError
             If the API key is missing and is required.
         """
-        if self.auth_type == AuthType.APIKey and (
-            self.api_key is None or self.api_key.strip() == ""
-        ):
+        # API Key is required for OpenAI, Gemini, and Azure with API Key auth
+        requires_api_key = (
+            self.type in ["openai_chat", "openai_embedding", "gemini_chat", "gemini_embedding"] or
+            (self.type in ["azure_openai_chat", "azure_openai_embedding"] and self.auth_type == AuthType.APIKey)
+        )
+        
+        if requires_api_key and (self.api_key is None or self.api_key.strip() == ""):
             raise ApiKeyMissingError(
                 self.type,
                 self.auth_type.value,
