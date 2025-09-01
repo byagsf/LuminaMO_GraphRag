@@ -394,7 +394,7 @@ sequenceDiagram
 ### ✅ **Criterios de Aceptación Final**
 
 #### Funcionalidad
-[ ] Sistema completamente operativo con todos los componentes
-[ ] Integración perfecta con Lumina Demo
-[ ] Respuestas precisas y contextuales de GraphRAG + Gemini
-[ ] Control de permisos funcionando al 100%
+- [ ] Sistema completamente operativo con todos los componentes
+- [ ] Integración perfecta con Lumina Demo
+- [ ] Respuestas precisas y contextuales de GraphRAG + Gemini
+- [ ] Control de permisos funcionando al 100%
