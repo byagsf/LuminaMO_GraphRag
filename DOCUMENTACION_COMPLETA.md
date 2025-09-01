@@ -632,35 +632,98 @@ graphrag/
 
 ## 🎯 Flujo de Trabajo Recomendado
 
-### 1. Primera Ejecución
+### 1. Primera Ejecución (Sistema Nuevo)
 ```bash
-# Configurar entorno
+# Configurar entorno (solo una vez)
 export GEMINI_API_KEY="tu_clave"
+python setup_auto_community.py  # Configuración automática
 
-# Indexing con configuración conservadora
-python -m graphrag.cli.index --root . --config settings.yaml
-
-# Si falla, usar script de recuperación
-python resume_indexing.py . settings.yaml
+# Indexing con auto-generación
+python quick_index.py ragtest settings_gemini.yaml
+# O alternativamente:
+python graphrag_wrapper.py python -m graphrag.cli.index --root ragtest
 ```
 
-### 2. Verificar Resultados
+### 2. Realizar Consultas (Funcionará en Cualquier Sistema)
 ```bash
-# Verificar archivos generados
-python test_local_data.py
+# Consulta rápida (recomendado - siempre funciona)
+python quick_query.py "Who is Scrooge?" ragtest local
+python quick_query.py "What is the story about?" ragtest global
 
-# Si falta community_reports, generar manualmente
-python generate_community_reports.py ./output
-```
+# Consultas oficiales (ahora con auto-community integrado)
+python -m graphrag.cli.query --root ragtest --method local "Who is Scrooge?"
+python -m graphrag.cli.query --root ragtest --method global "What is the story about?"
 
-### 3. Realizar Consultas
-```bash
-# Preferir consultas oficiales si están todos los archivos
-python -m graphrag.cli.query --root . --method local "tu pregunta"
-
-# Alternativamente, usar consultas locales
+# Consultas locales sin API (respaldo)
 python local_query_test.py
 python interactive_query.py
+```
+
+### 3. Verificar Sistema
+```bash
+# Probar todo el sistema
+python test_sistema.py
+
+# Verificar datos disponibles
+python test_local_data.py
+```
+
+## ✅ **PROBLEMA DE COMMUNITY_REPORTS RESUELTO**
+
+### **Solución Automática Universal:**
+
+El sistema ahora incluye **auto-generación automática** que funciona en **cualquier computadora nueva**:
+
+1. **🔧 Auto-detección:** Detecta automáticamente cuando falta `community_reports.parquet`
+2. **🚀 Auto-generación:** Crea community_reports inteligentes basados en entidades y relaciones existentes
+3. **🌐 Universal:** Funciona en cualquier sistema sin configuración adicional
+4. **🔄 Integrado:** Se ejecuta automáticamente con cualquier consulta
+
+### **Scripts Universales Creados:**
+
+#### 1. **`quick_query.py`** - Query Universal
+```bash
+# Uso simple - funciona en cualquier sistema
+python quick_query.py "tu pregunta" [directorio] [método]
+
+# Ejemplos:
+python quick_query.py "Who is Scrooge?" ragtest local
+python quick_query.py "What happens in the story?" ragtest global
+```
+
+#### 2. **`quick_index.py`** - Indexing Universal  
+```bash
+# Indexing con auto-recovery
+python quick_index.py [directorio] [config]
+
+# Ejemplo:
+python quick_index.py ragtest settings_gemini.yaml
+```
+
+#### 3. **`graphrag_wrapper.py`** - Wrapper Universal
+```bash
+# Envuelve cualquier comando de GraphRAG
+python graphrag_wrapper.py [comando_completo_de_graphrag]
+
+# Ejemplos:
+python graphrag_wrapper.py python -m graphrag.cli.index --root ragtest
+python graphrag_wrapper.py python -m graphrag.cli.query --root ragtest --method local "pregunta"
+```
+
+### **Funcionamiento en Sistema Nuevo:**
+
+```bash
+# En una computadora nueva con el proyecto:
+git clone https://github.com/tu-repo/LuminaMO_GraphRag.git
+cd LuminaMO_GraphRag
+pip install -e .
+export GEMINI_API_KEY="tu_clave"
+
+# ¡Las consultas funcionarán inmediatamente!
+python quick_query.py "Who is Scrooge?" ragtest local
+# → El sistema detecta que falta community_reports.parquet
+# → Lo genera automáticamente
+# → Ejecuta la consulta exitosamente
 ```
 
 ## 💡 Consejos para Producción
