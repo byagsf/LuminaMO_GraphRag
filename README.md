@@ -368,7 +368,7 @@ sequenceDiagram
 #### 🔄 **Integraciones Externas**
 - [ ] Conexión con Google Drive API funcionando
 - [ ] Integración con Dropbox completamente operativa
-- [ ] Soporte para NAS empresariales
+- [ ] Soporte para NAS empresariales (esto se tiene que desarrollar aparte y se tiene que solicitar permiso para el NAS
 - [ ] Sistema de webhooks para sincronización automática
 - [ ] Workers/jobs para procesamiento en background
 
@@ -376,17 +376,7 @@ sequenceDiagram
 - [ ] Sistema de permisos por empresa, rol y usuario
 - [ ] Validación de JWT sin crear usuarios nuevos
 - [ ] Filtrado de resultados según autorización
-- [ ] Logs de auditoría de todos los accesos
-- [ ] Encriptación de datos sensibles
-- [ ] Aislamiento completo entre empresas
 
-#### 🧪 **Pruebas y Testing**
-- [ ] Suite completa de tests unitarios
-- [ ] Tests de integración con todos los servicios
-- [ ] Pruebas de carga y rendimiento
-- [ ] Tests de seguridad y penetración básicos
-- [ ] Validación con datos de prueba realistas
-- [ ] Documentación de casos de prueba
 
 ### 🧑‍💻 **Entorno de Pruebas**
 
