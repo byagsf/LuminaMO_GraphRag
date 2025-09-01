@@ -189,7 +189,7 @@ graph TD
 
 ---
 
-## 4. Modelo de Datos
+## 4. Modelo de Datos (ojito, estos son solo para dar la idea, pueden basarse en ellas, pero seguramente faltaran tablas por agregar o datos que cambiaran)
 
 ### Tablas Principales
 
