@@ -44,9 +44,12 @@ class GeminiChatProvider:
         # Configure the Gemini API
         genai.configure(api_key=config.api_key)
         
-        # Set up the model (use gemini-pro by default)
-        model_name = config.model or "gemini-pro"
+        # Set up the model (use gemini-1.5-flash by default, which is more widely available)
+        model_name = config.model or "gemini-1.5-flash"
         self.model = genai.GenerativeModel(model_name)
+        
+        # Override encoding_model to avoid tiktoken issues
+        config.encoding_model = "cl100k_base"  # Use a default encoding that works
         
         self.config = config
         self.callbacks = callbacks
@@ -75,7 +78,7 @@ class GeminiChatProvider:
             if history:
                 # Convert history to Gemini format
                 chat = self.model.start_chat(history=self._convert_history(history))
-                response = await asyncio.to_thread(chat.send_message, prompt)
+                response = await asyncio.to_thread(chat.send_message, prompt, **kwargs)
             else:
                 # Simple generation without history
                 response = await asyncio.to_thread(
@@ -235,6 +238,10 @@ class GeminiEmbeddingProvider:
         
         # Use embedding model (text-embedding-004 or similar)
         self.model_name = config.model or "models/text-embedding-004"
+        
+        # Override encoding_model to avoid tiktoken issues
+        config.encoding_model = "cl100k_base"  # Use a default encoding that works
+        
         self.config = config
         self.callbacks = callbacks
         self.cache = cache
