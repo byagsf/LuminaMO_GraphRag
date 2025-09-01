@@ -1,16 +1,29 @@
 #!/usr/bin/env python3
 """
 Script para realizar consultas locales con datos GraphRAG sin usar API
+Incluye auto-generación de community_reports
 """
 
 import pandas as pd
 from pathlib import Path
 import json
 
+# Importar sistema automático
+try:
+    from auto_community_generator import ensure_community_reports
+    AUTO_COMMUNITY_AVAILABLE = True
+except ImportError:
+    AUTO_COMMUNITY_AVAILABLE = False
+
 def load_graphrag_data():
     """Cargar todos los datos GraphRAG disponibles"""
     root_dir = Path("/home/charizardbellako/Documentos/GraphRAG/LuminaMO_GraphRag/ragtest")
     output_dir = root_dir / "output"
+    
+    # Auto-generar community_reports si es necesario
+    if AUTO_COMMUNITY_AVAILABLE:
+        print("🔧 Verificando community_reports...")
+        ensure_community_reports(str(output_dir))
     
     data = {}
     
@@ -31,6 +44,12 @@ def load_graphrag_data():
     if text_units_path.exists():
         data['text_units'] = pd.read_parquet(text_units_path)
         print(f"✅ Unidades de texto cargadas: {len(data['text_units'])} registros")
+    
+    # Cargar community_reports (ahora debería existir)
+    community_reports_path = output_dir / "community_reports.parquet"
+    if community_reports_path.exists():
+        data['community_reports'] = pd.read_parquet(community_reports_path)
+        print(f"✅ Community reports cargados: {len(data['community_reports'])} registros")
     
     return data
 
