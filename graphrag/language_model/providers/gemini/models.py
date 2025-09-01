@@ -11,6 +11,8 @@ from typing import TYPE_CHECKING, Any
 
 import google.generativeai as genai
 
+logger = logging.getLogger(__name__)
+
 from graphrag.language_model.response.base import (
     BaseModelOutput,
     BaseModelResponse,
@@ -44,8 +46,8 @@ class GeminiChatProvider:
         # Configure the Gemini API
         genai.configure(api_key=config.api_key)
         
-        # Set up the model (use gemini-1.5-flash by default, which is more widely available)
-        model_name = config.model or "gemini-1.5-flash"
+        # Set up the model (use gemini-1.5-flash by default, which is stable and available)
+        model_name = config.model or "models/gemini-1.5-flash"
         self.model = genai.GenerativeModel(model_name)
         
         # Override encoding_model to avoid tiktoken issues
@@ -74,15 +76,18 @@ class GeminiChatProvider:
             The response from the model.
         """
         try:
+            # Filter out Gemini-incompatible parameters
+            gemini_kwargs = self._filter_gemini_params(kwargs)
+            
             # If history is provided, we need to format it for Gemini
             if history:
                 # Convert history to Gemini format
                 chat = self.model.start_chat(history=self._convert_history(history))
-                response = await asyncio.to_thread(chat.send_message, prompt, **kwargs)
+                response = await asyncio.to_thread(chat.send_message, prompt, **gemini_kwargs)
             else:
                 # Simple generation without history
                 response = await asyncio.to_thread(
-                    self.model.generate_content, prompt, **kwargs
+                    self.model.generate_content, prompt, **gemini_kwargs
                 )
             
             # Extract the text content
@@ -96,7 +101,7 @@ class GeminiChatProvider:
                 parsed_response=None,
                 history=history or [],
                 cache_hit=False,  # Gemini doesn't expose cache info directly
-                tool_calls=None,
+                tool_calls=[],  # Cambiado de None a lista vacía
                 metrics=None,
             )
             
@@ -185,7 +190,39 @@ class GeminiChatProvider:
         finally:
             loop.close()
 
-    def _convert_history(self, history: list) -> list:
+    def _filter_gemini_params(self, kwargs: dict) -> dict:
+        """Filter out parameters that Gemini doesn't support."""
+        # List of parameters that Gemini doesn't support
+        unsupported_params = {
+            'name', 'logit_bias', 'logprobs', 'top_logprobs', 'user',
+            'function_call', 'functions', 'tool_choice', 'tools',
+            'response_format', 'seed', 'service_tier', 'stop',
+            'stream', 'stream_options', 'suffix', 'presence_penalty',
+            'frequency_penalty', 'reasoning_effort'
+        }
+        
+        # Create a filtered dictionary with only supported parameters
+        gemini_kwargs = {}
+        
+        # Map some parameters to Gemini equivalents
+        for key, value in kwargs.items():
+            if key in unsupported_params:
+                continue  # Skip unsupported parameters
+            elif key == 'max_tokens':
+                # Gemini uses max_output_tokens
+                gemini_kwargs['max_output_tokens'] = value
+            elif key == 'temperature' and value is not None:
+                gemini_kwargs['temperature'] = value
+            elif key == 'top_p' and value is not None:
+                gemini_kwargs['top_p'] = value
+            elif key == 'n' and value != 1:
+                # Gemini doesn't support multiple completions, log a warning
+                logger.warning(f"Gemini doesn't support n={value}, using n=1")
+            # Add other parameters that Gemini supports
+            
+        return gemini_kwargs
+
+    def _convert_history(self, history: list[BaseMessage]) -> list:
         """
         Convert GraphRAG history format to Gemini format.
         

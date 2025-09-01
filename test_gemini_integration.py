@@ -31,7 +31,7 @@ async def test_gemini_chat():
         config = LanguageModelConfig(
             type="gemini_chat",
             api_key="AIzaSyD2emQC2huUXTcykYTM2uSgVxZPuAH_dqc",
-            model="gemini-1.5-flash",  # Cambiado a un modelo más disponible
+            model="models/gemini-1.5-flash",  # Modelo estable y disponible
             temperature=0.7,
             max_tokens=1000,
             encoding_model="cl100k_base",  # Evitar problemas con tiktoken
@@ -127,7 +127,7 @@ async def test_full_integration():
             config=LanguageModelConfig(
                 type="gemini_chat",
                 api_key="AIzaSyD2emQC2huUXTcykYTM2uSgVxZPuAH_dqc",
-                model="gemini-1.5-flash",  # Cambiado a un modelo más disponible
+                model="models/gemini-1.5-flash",  # Modelo estable y disponible
                 encoding_model="cl100k_base",
             ),
         )
